@@ -1,0 +1,37 @@
+services:
+
+  postgres-room:
+    image: postgres:latest
+    container_name: postgres-room
+    ports:
+      - "5441:5432"
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=room_service
+    volumes:
+      - ./data/postgres/room:/var/lib/postgresql/data  # Persistent storage for PostgreSQL data
+      - ./init/postgres/room-init.sql:/docker-entrypoint-initdb.d/room-init.sql
+    networks:
+      - spring
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin-room
+    ports:
+      - "8083:80"
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+      - PGADMIN_DEFAULT_PASSWORD=password
+    depends_on:
+      - postgres
+    networks:
+      - spring
+
+networks:
+  spring:
+    driver: bridge
+
+volumes:
+  postgres-room-db:
+    driver: local

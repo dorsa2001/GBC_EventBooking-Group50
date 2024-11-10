@@ -1,0 +1,186 @@
+version: '3.9'
+
+services:
+  # Approval Service
+  approval-service:
+    image: approval-service
+    build:
+      context: ./ApprovalService
+      dockerfile: Dockerfile
+    container_name: approval-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      spring_application_name: approval-service
+      server_port: 8088
+      spring_data_mongodb_host: mongodb_assignment
+      spring_data_mongodb_port: 27019
+      spring_data_mongodb_database: approval-service
+      spring_data_mongodb_username: admin
+      spring_data_mongodb_password: password
+      spring_data_mongodb_authentication_database: admin
+    ports:
+      - "8088:8088"
+    depends_on:
+      - mongodb
+    networks:
+      - spring
+
+  # Booking Service
+  booking-service:
+    image: booking-service
+    build:
+      context: ./BookingService
+      dockerfile: Dockerfile
+    container_name: booking-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      spring_application_name: booking-service
+      server_port: 8090
+      spring_data_mongodb_host: mongodb_assignment
+      spring_data_mongodb_port: 27019
+      spring_data_mongodb_database: booking-service
+      spring_data_mongodb_username: admin
+      spring_data_mongodb_password: password
+      spring_data_mongodb_authentication_database: admin
+    ports:
+      - "8090:8090"
+    depends_on:
+      - mongodb
+    networks:
+      - spring
+
+  # Event Service
+  event-service:
+    image: event-service
+    build:
+      context: ./EventService
+      dockerfile: Dockerfile
+    container_name: event-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      spring_application_name: event-service
+      server_port: 8092
+      spring_data_mongodb_host: mongodb_assignment
+      spring_data_mongodb_port: 27019
+      spring_data_mongodb_database: event-service
+      spring_data_mongodb_username: admin
+      spring_data_mongodb_password: password
+      spring_data_mongodb_authentication_database: admin
+    ports:
+      - "8092:8092"
+    depends_on:
+      - mongodb
+    networks:
+      - spring
+
+  # Room Service
+  room-service:
+    image: room-service
+    build:
+      context: ./RoomService
+      dockerfile: Dockerfile
+    container_name: room-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      spring_application_name: room-service
+      server_port: 8095
+      spring_datasource_url: jdbc:postgresql://postgres:5432/room-service
+      spring_datasource_username: admin
+      spring_datasource_password: password
+      spring_datasource_driver_class_name: org.postgresql.Driver
+      spring_jpa_database_platform: org.hibernate.dialect.PostgreSQLDialect
+      spring_jpa_show_sql: true
+      spring_jpa_hibernate_ddl_auto: none
+    ports:
+      - "8095:8095"
+    depends_on:
+      - postgres
+    networks:
+      - spring
+
+  # User Service
+  user-service:
+    image: user-service
+    build:
+      context: ./UserService
+      dockerfile: Dockerfile
+    container_name: user-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      spring_application_name: user-service
+      server_port: 8097
+      spring_datasource_url: jdbc:postgresql://postgres:5432/user-service
+      spring_datasource_username: admin
+      spring_datasource_password: password
+      spring_datasource_driver_class_name: org.postgresql.Driver
+      spring_jpa_database_platform: org.hibernate.dialect.PostgreSQLDialect
+      spring_jpa_show_sql: true
+      spring_jpa_hibernate_ddl_auto: none
+    ports:
+      - "8097:8097"
+    depends_on:
+      - postgres
+    networks:
+      - spring
+
+  # MongoDB
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb_assignment
+    ports:
+      - "27019:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+    volumes:
+      - ./data/mongo:/data/db
+      - ./init/mongo/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+    networks:
+      - spring
+
+  # Mongo Express
+  mongo-express:
+    image: mongo-express
+    ports:
+      - "8083:8081"  # Changed to 8083
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: password
+      ME_CONFIG_MONGODB_SERVER: mongodb_assignment
+    container_name: mongo-express-assignment
+    restart: unless-stopped
+    depends_on:
+      - mongodb
+    networks:
+      - spring
+
+  # PostgreSQL
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+      - ./init/postgres:/docker-entrypoint-initdb.d
+    networks:
+      - spring
+
+  # PgAdmin
+  pgadmin:
+    image: dpage/pgadmin4
+    ports:
+      - "8888:80"
+    container_name: pgadmin-assignment1
+    environment:
+      PGADMIN_DEFAULT_EMAIL: user@domain.ca
+      PGADMIN_DEFAULT_PASSWORD: password
+    networks:
+      - spring
+
+networks:
+  spring:
+    driver: bridge

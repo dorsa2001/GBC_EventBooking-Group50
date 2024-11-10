@@ -15,10 +15,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Booking {
 
     @Id
-    private String id;
-    private String userId;
-    private String roomId;
-    private String startTime;
-    private String endTime;
-    private String purpose;
+        private String id;
+        private String userId;
+        private String roomId;
+        private String startTime;
+        private String endTime;
+        private String purpose;
 }

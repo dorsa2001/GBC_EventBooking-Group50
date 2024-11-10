@@ -38,6 +38,7 @@ dependencies {
 	testImplementation("org.testcontainers:mongodb")
 	runtimeOnly("org.postgresql:postgresql")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+	testImplementation("io.rest-assured:rest-assured:5.5.0")
 }
 
 tasks.withType<Test> {
